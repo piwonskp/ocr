@@ -1,0 +1,33 @@
+version: '2'
+
+services:
+
+  postgres:
+    image: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/
+
+  web:
+    build: backend
+    env_file: .env_local
+    volumes:
+      - ./backend:/usr/src/app
+    ports:
+      - "8000:8000"
+    links:
+      - postgres
+    command: python manage.py runserver 0.0.0.0:8000
+
+  frontend:
+    build: frontend
+    volumes:
+      - ./frontend:/usr/src/app
+      - ./frontend/node_modules:/usr/src/app/node_modules
+    ports:
+      - "3000:3000"
+    links:
+      - web
+    command: npm start
+
+volumes:
+  pgdata:
